@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TareaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::controller(TareaController::class) -> group(function () {
+    Route::post("/tarea",        "Create");
+    Route::get("/tarea/{id}",    "Read");
+    Route::put("/tarea/{id}",    "Update");
+    Route::delete("/tarea/{id}", "Delete");
 });
