@@ -23,6 +23,9 @@ Route::controller(TareaController::class) -> group(function () {
     Route::post("/tarea",        "Create");
     Route::get("/tarea",         "List");
     Route::get("/tarea/{id}",    "Read");
+    Route::get("/tarea/{title}", "ListForTitle");
+    Route::get("/tarea/{autor}", "ListForAuthor");
+    Route::get("/tarea/{estado}", "ListForStatus");
     Route::put("/tarea/{id}",    "Update");
     Route::delete("/tarea/{id}", "Delete");
 });
