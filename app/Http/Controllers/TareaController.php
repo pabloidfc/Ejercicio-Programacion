@@ -45,4 +45,9 @@ class TareaController extends Controller
         $tarea->delete();
         return response(['msg' => 'Eliminada correctamente!!'], 200);
     }
+
+    public function List() {
+        $tareas = Tarea::all();
+        return $tareas;
+    }
 }
