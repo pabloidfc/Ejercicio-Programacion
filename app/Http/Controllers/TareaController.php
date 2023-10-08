@@ -8,14 +8,14 @@ use App\Models\Tarea;
 
 class TareaController extends Controller
 {
-    public function Create(Request $request) {
-        $tarea = new Tarea;
+    public function create(Request $req) {
+        $task = new Tarea;
 
-        $validaciones = Validator::make($request->all(), [
-            "titulo"    => "required",
-            "contenido" => "required",
-            "estado"    => "required",
-            "autor"     => "required",
+        $validaciones = Validator::make($req->all(), [
+            'titulo'    => 'required|min:3',
+            'contenido' => 'required|min:10',
+            'estado'    => 'nullable',
+            'autor'     => 'required|min:3',
         ]);
 
 
@@ -23,62 +23,80 @@ class TareaController extends Controller
             return response([$validaciones->errors()], 400);
         }
 
-        $tarea -> titulo    = $request -> titulo;
-        $tarea -> contenido = $request -> contenido;
-        $tarea -> estado    = $request -> estado;
-        $tarea -> autor     = $request -> autor;
-        $tarea -> save();
+        $task -> titulo    = $req -> input('titulo');
+        $task -> contenido = $req -> input('contenido');
+        $task -> estado    = $req -> input('estado');
+        $task -> autor     = $req -> input('autor');
+        $task -> save();
 
-        return $tarea;
+        return $task;
     }
 
-    public function Read($tareaID) {
-        $tarea = Tarea::find($tareaID);
-        
-        if ($tarea) return $tarea;
-        return response(['msg' => 'No existe'], 404);
+    public function read($taskID) {
+        $task = Tarea::find($taskID);
+        if (!$task) response(['msg' => 'No se han encontrado tareas!'], 404);
+        return $task;
     }
     
-    public function Update(Request $request, $tareaID) {
-        $tarea = Tarea::find($tareaID);
-        if (!$tarea) return response(['msg' => 'No existe'], 404);
+    public function update(Request $req, $taskID) {
+        $task = Tarea::find($taskID);
+        if (!$task) return response(['msg' => 'No se han encontrado tareas!'], 404);
+
+        $validaciones = Validator::make($req->all(), [
+            'titulo'    => 'nullable|min:3',
+            'contenido' => 'nullable|min:10',
+            'estado'    => 'nullable',
+            'autor'     => 'nullable|min:3',
+        ]);
+
+        if($validaciones->fails()) {
+            return response([$validaciones->errors()], 400);
+        }
+
+        if ($req -> input('titulo'))    $task -> titulo    = $req -> input('titulo');
+        if ($req -> input('contenido')) $task -> contenido = $req -> input('contenido');
+        if ($req -> input('estado'))    $task -> estado    = $req -> input('estado');
+        if ($req -> input('autor'))     $task -> autor     = $req -> input('autor');
+        $task -> save();
         
-        if ($request -> input('titulo'))    $tarea -> titulo    = $request -> titulo;
-        if ($request -> input('contenido')) $tarea -> contenido = $request -> contenido;
-        if ($request -> input('estado'))    $tarea -> estado    = $request -> estado;
-        if ($request -> input('autor'))     $tarea -> autor     = $request -> autor;
-        $tarea -> save();
-        
-        return $tarea;
+        return $task;
     }
     
-    public function Delete($tareaID) {
-        $tarea = Tarea::find($tareaID);
-        if (!$tarea) return response(['msg' => 'No existe'], 404);
-        $tarea->delete();
+    public function delete($taskID) {
+        $task = Tarea::find($taskID);
+        if (!$task) return response(['msg' => 'No se han encontrado tareas!'], 404);
+        $task->delete();
         return response(['msg' => 'Eliminada correctamente!!'], 200);
     }
 
-    public function List() {
-        $tareas = Tarea::all();
-        return $tareas;
+    public function list() {
+        return Tarea::all();
     }
 
-    public function ListForTitle($tareaTitle) {
-        $tarea = Tarea::where($tareaTitle);
-        if ($tarea) return $tarea;
-        return response(['msg' => 'No existe'], 404);
+    public function listForTitle(Request $req) {
+        if ($req->input('titulo')) {
+            $task = Tarea::where('titulo', $req->input('titulo'))->get();
+        } else {
+            return response(['msg' => 'Debes enviar un titulo'], 400);
+        }
+        return $task;
     }
 
-    public function ListForAuthor($tareaAuthor) {
-        $tarea = Tarea::where($tareaTitle);
-        if ($tarea) return $tarea;
-        return response(['msg' => 'No existe'], 404);
+    public function listForAuthor(Request $req) {
+        if ($req->input('autor')) {
+            $task = Tarea::where('autor', $req->input('autor'))->get();
+        } else {
+            return response(['msg' => 'Debes enviar un autor'], 400);
+        }
+        return $task;
     }
 
-    public function ListForStatus($tareaStatus) {
-        $tarea = Tarea::where($tareaTitle);
-        if ($tarea) return $tarea;
-        return response(['msg' => 'No existe'], 404);
+    public function listForStatus(Request $req) {
+        if ($req->input('estado')) {
+            $task = Tarea::where('estado', $req->input('estado'))->get();
+        } else {
+            return response(['msg' => 'Debes enviar un estado'], 400);
+        }
+        return $task;
     }
 }
